@@ -60,6 +60,8 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 #| include: false
 library(tidyverse)
 library(patchwork)
+library(pwr)
+library(ggplot2)
 ```
 
 # Remaining Portfolio Work!
@@ -114,16 +116,92 @@ That is, the unit of measure is the syllable as measured on six birds, and the m
 ## Part a
 Using the `pwr` package for \texttt{R} [@pwr], conduct a power analysis. How many observations would the researchers need to detect a moderate-to-large effect ($d=0.65$) when using $\alpha=0.05$ and default power (0.80) for a two-sided one sample $t$ test.
 
+**Solution**
+
+Here, I can use the pwr package to conduct a t.test with the given inputs ("d, $\alpha$, and power"). The researchers would need at least 21 (can't observe 20.58 birds) observations to see an effect size of d = 0.65. 
+```{r}
+power.t.test(d=0.65, sig.level = 0.05, power = 0.8, type = "one.sample", alternative = "two.sided")
+```
+
 ## Part b
 Click the link to go to the paper. Find the source data for Figure 2. Download the Excel file. Describe what you needed to do to collect the data for Figure 2(g). Note that you only need the `closer_vals` and `further_vals`. Ensure to `mutate()` the data to get a difference (e.g., `closer_vals - further_vals`).
+
+**Solution**
+
+I downloaded the excel file, then grabbed the data from the further_vals and closer_vals tabs to manually copy paste into a more friendly csv file. Yes, I accidentally misspelled further as farther, and that shows an easy slip up in this process. After putting the data into a csv, I added it to my working folder, and read it using tidyverse. I also cleaned the data and added a new column that gets the difference between the closer and farther vals. 
+```{r}
+data = read_csv("fig_2g.csv")
+data = data |>
+  select(closer_vals, farther_vals) |>
+  mutate(diff = closer_vals - farther_vals)
+view(data)
+```
 
 ## Part c
 Summarize the data.
 
 * Summarize the further data. Do the data suggest that dopamine in the brains of young zebra finches decreases when they sing further away?
+
+**Solution**
+
+```{r}
+#| fig-cap: "Dopamine for Farther Syllables"
+summary(data$farther_vals)
+
+ggplot(data, aes(x = farther_vals)) +
+  geom_histogram(bins = 20) +
+  labs(x = "Dopamine Change",
+       y = "Count") +
+  geom_vline(xintercept = mean(data$farther_vals))
+
+mean(data$farther_vals)
+```
+
+Here the data suggest that the dopamine decreases when the finches sing further away. This is seen in the average negative dopamine response. 
+
 * Summarize the closer data. Do the data suggest that dopamine in the brains of young zebra finches increases when they sing closer to their adult song?
+
+**Solution**
+
+```{r}
+#| fig-cap: "Dopamine for Closer Syllables"
+summary(data$closer_vals)
+
+ggplot(data, aes(x = closer_vals)) +
+  geom_histogram(bins = 20) +
+  labs(x = "Dopamine Change",
+       y = "Count") +
+  geom_vline(xintercept = mean(data$closer_vals))
+
+mean(data$closer_vals)
+```
+
+Here the data suggest that dopamine increases on average when the finches sing closer. The mean is positive here. 
+
 * Summarize the paired differences. Do the data suggest that there is a difference between dopamine in the brains of young zebra finches when they sing further away compared to closer to their adult song?
+
+**Solution**
+
+```{r}
+#| fig-cap: "Difference (closer-farther) in Dopamine"
+summary(data$diff)
+
+ggplot(data, aes(x = diff)) +
+  geom_histogram(bins = 20) +
+  labs(x = "Dopamine Change",
+       y = "Count") +
+  geom_vline(xintercept = mean(data$diff))
+
+mean(data$diff)
+```
+
+Here, because the mean is positive, the data suggest that the closer songs always gives greater dopamine compared to the farther songs. 
+
 * **Optional Challenge** Can you reproduce Figure 2(g)? Note that the you can use \texttt{geom\_errorbar()} to plot the range created by adding the mean $\pm$ one standard deviation.
+
+**Solution**
+
+I'm okay thanks. 
 
 ## Part d
 Conduct the inferences they do in the paper. Make sure to report the results a little more comprehensively -- that is your parenthetical should look something like: ($t=23.99$, $p<0.0001$; $g=1.34$; 95% CI: 4.43, 4.60). Ensure to verify any conditions for use.\
@@ -131,10 +209,48 @@ Conduct the inferences they do in the paper. Make sure to report the results a l
 
 * "The close responses differed significantly from 0 ($p=1.63 \times 10^{-8}$).''\
 **Note**: Use the appropriate one-sided test.
+
+**Solution**
+
+```{r}
+t_close = t.test(data$closer_vals, mu = 0, alternative = "greater")
+t_close
+
+t_close$statistic
+t_close$p.value
+t_close$conf.int
+```
+
 * "The far responses differed significantly from 0 ($p=5.17 \times 10^{-8}$).''\
 **Note**: Use the appropriate one-sided test.
+
+**Solution**
+
+```{r}
+t_far = t.test(data$farther_vals, mu = 0, alternative = "less")
+t_far
+
+t_far$statistic
+t_far$p.value
+t_far$conf.int
+```
+
+
 * "The difference between populations was significant ($p=1.04 \times10^{-8}$).''\
 **Note**: Use the two-sided test.
+
+**Solution**
+
+```{r}
+t_diff = t.test(data$diff,mu = 0, alternative = "two.sided")
+t_diff
+
+t_diff$statistic
+t_diff$p.value
+t_diff$conf.int
+
+
+```
 
 ## Part e 
 
