@@ -216,10 +216,10 @@ Conduct the inferences they do in the paper. Make sure to report the results a l
 t_close = t.test(data$closer_vals, mu = 0, alternative = "greater")
 t_close
 
-t_close$statistic
-t_close$p.value
-t_close$conf.int
 ```
+
+The dopamine response for closer singing is significantly greater than 0 (t = 9.16, p < 0.0001, 95% CI: 0.145, $\infty$), suggesting dopamine increases when birds sing closer.
+
 
 * "The far responses differed significantly from 0 ($p=5.17 \times 10^{-8}$).''\
 **Note**: Use the appropriate one-sided test.
@@ -229,11 +229,9 @@ t_close$conf.int
 ```{r}
 t_far = t.test(data$farther_vals, mu = 0, alternative = "less")
 t_far
-
-t_far$statistic
-t_far$p.value
-t_far$conf.int
 ```
+
+The dopamine response for farther singing is significantly less than 0 (t = −7.92, p < 0.0001, 95% CI: $-\infty$, −0.167), suggesting dopamine decreases when birds sing farther.
 
 
 * "The difference between populations was significant ($p=1.04 \times10^{-8}$).''\
@@ -244,13 +242,9 @@ t_far$conf.int
 ```{r}
 t_diff = t.test(data$diff,mu = 0, alternative = "two.sided")
 t_diff
-
-t_diff$statistic
-t_diff$p.value
-t_diff$conf.int
-
-
 ```
+
+The paired difference between closer and farther singing is statistically significant (t = 9.14, p < 0.0001, 95% CI: 0.303, 0.480), signifying a statistical difference in dopamine responses between singing close and far.
 
 ## Part e 
 
