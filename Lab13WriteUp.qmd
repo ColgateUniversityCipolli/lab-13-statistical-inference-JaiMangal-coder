@@ -310,3 +310,7 @@ ggplot(ggdat) +
 ```
 
 Because our observed t statistic is well into the rejection region of the null distribution, this signifies the observation is very unlikely (p=2.74 e-09) under the null hypothesis. Also, the resampling distribution is centered away from 0, thus we can say the observed effect is not due to random chance either. Therefore, the alternative hypothesis has statistical support that there is a true difference in dopamine response in the paired difference of singing close versus far from the real song. 
+
+Genuinely thank you for a great semester. Statistics is by far my weakest mathematical area, so I came into this class with very low expectations. You pushed me a lot harder and I came to appreciate this topic for which I had ignorantly passed judgment. Thank you for being funny (yes ur dumb stats jokes somehow make me chuckle) and I hope you have a great summer. 
+
+P.S. Please mess with Oscar as much as you can next year. Poor guy, who's gonna give him a hard time if I'm not there anymore? 
