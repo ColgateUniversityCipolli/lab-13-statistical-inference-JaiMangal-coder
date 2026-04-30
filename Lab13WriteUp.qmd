@@ -212,6 +212,8 @@ Conduct the inferences they do in the paper. Make sure to report the results a l
 
 **Solution**
 
+I get to cheat and use t.test so all of this is mostly trivial. 
+
 ```{r}
 t_close = t.test(data$closer_vals, mu = 0, alternative = "greater")
 t_close
@@ -254,4 +256,57 @@ to highlight the rejection region and the $p$-value. Additionally, add the
 resampling distribution for $T$ to the chart to demonstrate any differences 
 between the null distribution and the distribution suggested by the data.
 
+```{r}
+#| fig-cap: "T distribution with rejection region shown"
+set.seed(7272)
 
+t.stat = t_diff$statistic
+n = length(data$diff)
+s = sd(data$diff)
+mu0 = 0
+
+#null t distr
+ggdat = tibble(t = seq(-4, 4, length.out = 1000)) |>
+  mutate(pdf.h0 = dt(t, df = n-1))
+
+#resampling
+ts = rep(NA, 1000)
+for(i in 1:1000){
+  curr_sample = sample(data$diff, size=n, replace=T)
+  ts[i] = (mean(curr_sample) - mu0)/(s/sqrt(n))
+}
+
+#rejection zone
+alpha = 0.05
+t_crit = qt(1 - alpha/2, n-1)
+
+ggplot(ggdat) + 
+  geom_line(aes(x=t, y=pdf.h0))+
+  stat_density(data=tibble(t=ts), aes(x=t), color="grey", geom="line")+
+  geom_hline(yintercept=0) +
+  # Plot observation
+  geom_point(data=tibble(x=t.stat, y=0),
+              aes(x=x, y=y), color="red", size=3) +
+  # Plot mirrored observation
+  geom_point(aes(x = -t.stat, y = 0),
+             color = "red", size = 3, alpha = 0.3) +
+  # Rejection zone
+  #Right tail
+  geom_ribbon(data = ggdat 
+                |> filter(t>= t_crit),
+          aes(x = t, ymin = 0, ymax = pdf.h0),
+          alpha = 0.3) + 
+  #Left tail
+  geom_ribbon(data = ggdat 
+                |> filter(t<= -t_crit),
+          aes(x = t, ymin = 0, ymax = pdf.h0),
+          alpha = 0.3) + 
+
+  theme_bw()+
+  xlab("t")+
+  ylab("pdf.h0")
+
+
+```
+
+Because our observed t statistic is well into the rejection region of the null distribution, this signifies the observation is very unlikely (p=2.74 e-09) under the null hypothesis. Also, the resampling distribution is centered away from 0, thus we can say the observed effect is not due to random chance either. Therefore, the alternative hypothesis has statistical support that there is a true difference in dopamine response in the paired difference of singing close versus far from the real song. 
